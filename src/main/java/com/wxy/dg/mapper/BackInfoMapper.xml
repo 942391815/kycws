@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="com.wxy.dg.common.model.BackInfo">
+
+    <resultMap id="backInfo" type="com.wxy.dg.common.model.BackInfo">
+        <result property="bid" column="bid"/>
+        <result property="url" column="url"/>
+        <result property="title" column="title"/>
+        <result property="source" column="source"/>
+        <result property="submitTime" column="submit_time"/>
+        <result property="subId" column="sub_id"/>
+        <result property="state" column="state"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="userId" column="user_id"/>
+        <result property="round" column="round"/>
+        <result property="handleTime" column="handle_time"/>
+        <result property="isTort" column="is_tort"/>
+        <result property="subType" column="sub_type"/>
+        <result property="briefing" column="briefing"/>
+
+    </resultMap>
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="columns">
+        <![CDATA[
+
+		bid,url,title,source,DATE_FORMAT(submit_time,'%Y-%m-%d:%T') submit_time ,sub_id,state,
+		DATE_FORMAT(update_time,'%Y-%m-%d:%T') update_time,user_id,`round`,handle_time,is_tort,sub_type,briefing
+
+        ]]>
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="bid">
+        <![CDATA[
+
+        INSERT INTO back_info (
+        	bid,title,url,source,sub_id,submit_time,state,update_time,user_id,`round`,handle_time,is_tort,sub_type,briefing
+        ) VALUES (
+        	#{bid} ,
+        	#{title} ,
+        	#{url} ,
+        	#{source} ,
+        	#{subId},
+        	#{submitTime},
+        	#{state},
+        	#{updateTime},
+        	#{userId},
+        	#{round},
+        	#{handleTime},
+        	#{isTort},
+        	#{subType},
+        	#{briefing}
+        )
+
+        ]]>
+    </insert>
+
+    <sql id="update_sql">
+        <set>
+            <if test="bid != null">
+                bid = #{bid},
+            </if>
+            <if test="url != null and url !=''">
+                url = #{url},
+            </if>
+            <if test="title != null and title !=''">
+                title = #{title},
+            </if>
+            <if test="source != null">
+                source = #{source},
+            </if>
+            <if test="submitTime != null">
+                submit_time = #{submitTime},
+            </if>
+            <if test="subId != null">
+                sub_id = #{subId},
+            </if>
+            <if test="state != null">
+                state = #{state},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="handleTime != null and handleTime!=''">
+                handle_time = #{handleTime},
+            </if>
+            <if test="round != null">
+                `round` = #{round},
+            </if>
+            <if test="isTort != null">
+                `is_tort` = #{isTort},
+            </if>
+            <if test="subType != null">
+                `sub_type` = #{subType},
+            </if>
+            <if test="briefing != null">
+                `briefing` = #{briefing},
+            </if>
+        </set>
+    </sql>
+
+    <update id="update">
+        UPDATE back_info
+        <include refid="update_sql"/>
+        WHERE
+        bid = #{bid}
+    </update>
+
+    <sql id="findPage_where">
+        <where>
+            1 = 1
+            <if test="bid != null">
+                and bid = #{bid}
+            </if>
+            <if test="url != null and url !=''">
+                and url = #{url}
+            </if>
+            <if test="title != null and title !=''">
+                and title = #{title}
+            </if>
+            <if test="source != null">
+                and source = #{source}
+            </if>
+            <if test="submitTime != null">
+                and submit_time = #{submitTime}
+            </if>
+            <if test="subId != null and subId !='' ">
+                and sub_id = #{subId}
+            </if>
+            <if test="state != null">
+                and state = #{state}
+            </if>
+            <if test="updateTime != null">
+                and update_time = #{updateTime}
+            </if>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test="round != null">
+                and round = #{round}
+            </if>
+            <if test="handleTime != null and handleTime!=''">
+                and handleTime = #{handleTime}
+            </if>
+            <if test="isTort != null">
+                and `is_tort` = #{isTort}
+            </if>
+            <if test="subType != null">
+                and `sub_type` = #{subType}
+            </if>
+            <if test="briefing != null and briefing!=''">
+                and briefing = #{briefing}
+            </if>
+
+        </where>
+    </sql>
+
+    <select id="findPage_count" resultType="long">
+        SELECT count(*) FROM back_info
+        <include refid="findPage_where"/>
+    </select>
+
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="findPage" resultMap="backInfo">
+        SELECT
+        <include refid="columns"/>
+        FROM back_info
+        <include refid="findPage_where"/>
+
+        <if test="sortColumns != null and sortColumns !=''">
+            ORDER BY ${sortColumns}
+        </if>
+    </select>
+
+    <select id="sendmessage" resultType="java.util.HashMap" parameterType="java.util.List">
+        SELECT c.`mob`,t.url,t.`title`,t.`writer` FROM sub_info t JOIN consumer c ON t.`user_id`=c.`uid` WHERE t.`sid`
+        IN
+        <foreach item="eachItem" collection="list" open="(" separator="," close=")">
+            #{eachItem}
+        </foreach>
+    </select>
+
+
+    <select id="getById" resultMap="backInfo">
+        SELECT
+        <include refid="columns"/>
+        FROM back_info where bid=#{bid}
+    </select>
+
+    <select id="getSendMessageTask" resultType="java.util.HashMap">
+        SELECT sub_info.`url`,back.`title`,back.`source`,con.mob,con.name FROM back_info back JOIN sub_info ON sub_info.`sid`=back.`sub_id`
+        JOIN consumer con ON con.openid=sub_info.openid WHERE back.`round`=#{round} and back.state=3 and back.sub_id=#{subId}
+    </select>
+
+</mapper>

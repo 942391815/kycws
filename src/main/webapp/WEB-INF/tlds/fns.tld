@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+  version="2.0">
+    
+  <description>JSTL functions library</description>
+  <display-name>JSTL functions sys</display-name>
+  <tlib-version>1.2</tlib-version>
+  <short-name>fns</short-name>
+  <uri>http://java.sun.com/jsp/jstl/functionss</uri>
+
+  <function>
+    <description>按字节长度截取字符串</description>
+    <name>trimByte</name>
+    <function-class>com.wxy.dg.common.util.CommonUtil</function-class>
+    <function-signature>java.lang.String trimByte(java.lang.String, int)</function-signature>
+  </function>
+
+  <function>
+  <description>获取字典对象列表</description>
+  <name>getCodeList</name>
+  <function-class>com.wxy.dg.common.util.DictUtils</function-class>
+  <function-signature>java.util.List getCodeList(java.lang.String)</function-signature>
+  <example>${fns:getCodeList(type)}</example>
+</function>
+
+  <function>
+    <description>获取字典对象列表原创守护者和审核员角色</description>
+    <name>getCodeListNormal</name>
+    <function-class>com.wxy.dg.common.util.DictUtils</function-class>
+    <function-signature>java.util.List getCodeListNormal(java.lang.String)</function-signature>
+    <example>${fns:getCodeListNormal(type)}</example>
+  </function>
+
+  <function>
+    <description>获取订单类型字典表</description>
+    <name>getOrderTypeList</name>
+    <function-class>com.wxy.dg.common.util.DictUtils</function-class>
+    <function-signature>java.util.List getOrderTypeList()</function-signature>
+    <example>${fns:getOrderTypeList}</example>
+  </function>
+
+</taglib>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="com.wxy.dg.common.model.Consumer">
+
+    <resultMap id="user" type="com.wxy.dg.common.model.Consumer">
+        <result property="uid" column="uid"/>
+        <result property="openId" column="openid"/>
+        <result property="name" column="name"/>
+        <result property="mob" column="mob"/>
+        <result property="img" column="img"/>
+        <result property="code" column="code"/>
+        <result property="level" column="level"/>
+        <result property="state" column="state"/>
+
+    </resultMap>
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="columns">
+        <![CDATA[
+		uid,openid,name,mob,img,code,level,state
+	    ]]>
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="uid">
+        <![CDATA[
+        INSERT INTO consumer (
+        	uid,openid,name,mob,img,code,level,state
+        ) VALUES (
+        	#{uid} ,
+        	#{openId} ,
+        	#{name} ,
+        	#{mob} ,
+        	#{img} ,
+        	#{code} ,
+        	#{level} ,
+        	#{state}
+        )
+    ]]>
+    </insert>
+
+    <sql id="update_sql">
+        <set>
+            <if test="openId != null">
+                 openid = #{openId},
+            </if>
+            <if test="mob != null and mob !=''">
+                 mob = #{mob},
+            </if>
+            <if test="img != null">
+                 img = #{img},
+            </if>
+            <if test="code != null">
+                 code = #{code},
+            </if>
+            <if test="level != null and level !=''">
+                 level = #{level},
+            </if>
+            <if test="state != null">
+                 state = #{state}
+            </if>
+        </set>
+    </sql>
+
+    <update id="update" >
+        UPDATE  consumer
+        <include refid="update_sql" />
+        WHERE
+        uid = #{uid}
+    </update>
+
+    <sql id="findPage_where">
+        <where>
+            1 = 1
+            <if test="uid != null">
+                AND uid = #{uid}
+            </if>
+            <if test="openId != null">
+                AND openid = #{openId}
+            </if>
+            <if test="mob != null and mob !=''">
+                AND mob = #{mob}
+            </if>
+            <if test="img != null">
+                AND img = #{img}
+            </if>
+            <if test="code != null">
+                AND code = #{code}
+            </if>
+            <if test="level != null and level !=''">
+                AND level = #{level}
+            </if>
+            <if test="state != null">
+                AND state = #{state}
+            </if>
+        </where>
+    </sql>
+
+    <select id="findPage_count" resultType="long">
+        SELECT count(*) FROM consumer
+        <include refid="findPage_where"/>
+    </select>
+
+    <select id="getById" resultMap="user" >
+        SELECT <include refid="columns" /> FROM consumer
+        WHERE uid=#{uid}
+    </select>
+
+
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="findPage" resultMap="user">
+        SELECT <include refid="columns" />
+        FROM consumer
+        <include refid="findPage_where"/>
+
+        <if test="sortColumns != null and sortColumns !=''">
+            ORDER BY ${sortColumns}
+        </if>
+    </select>
+
+</mapper>

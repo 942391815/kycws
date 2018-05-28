@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="com.wxy.dg.common.model.SubInfo">
+
+    <resultMap id="subinfo" type="com.wxy.dg.common.model.SubInfo">
+        <result property="sid" column="sid"/>
+        <result property="url" column="url"/>
+        <result property="name" column="name"/>
+        <result property="subTime" column="sub_time"/>
+        <result property="businessType" column="business_type"/>
+        <result property="subType" column="sub_type"/>
+        <result property="state" column="state"/>
+        <result property="userId" column="user_id"/>
+        <result property="openid" column="openid"/>
+        <result property="round" column="round"/>
+        <result property="orderId" column="order_id"/>
+        <result property="handleTime" column="handle_time"/>
+        <result property="nextHandleTime" column="next_handle_time"/>
+        <result property="describe" column="describe"/>
+    </resultMap>
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="columns">
+        <![CDATA[
+		sid,url,name,DATE_FORMAT(sub_time,'%Y-%m-%d:%T') sub_time,business_type,state,user_id,
+		openid,round,order_id,handle_time,sub_type,DATE_FORMAT(next_handle_time,'%Y-%m-%d:%T') next_handle_time
+		,`describe`
+	    ]]>
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true">
+        <![CDATA[
+        INSERT INTO sub_info (
+        	sid,url,name,sub_time,business_type,state,user_id,openid,round,order_id,handle_time,sub_type,next_handle_time,`describe`
+        ) VALUES (
+        	#{sid} ,
+        	#{url} ,
+        	#{name} ,
+        	#{subTime} ,
+        	#{businessType} ,
+        	#{state},
+        	#{userId},
+        	#{openid},
+        	#{round},
+        	#{orderId},
+        	#{handleTime},
+        	#{subType},
+        	#{nextHandleTime},
+        	#{describe}
+        )
+    ]]>
+    </insert>
+
+    <sql id="update_sql">
+        <set>
+            <if test="sid != null">
+                sid = #{sid},
+            </if>
+            <if test="name != null and name !=''">
+                name = #{name},
+            </if>
+            <if test="subTime != null">
+                sub_time = #{subTime},
+            </if>
+            <if test="businessType != null and businessType!=''">
+                business_type = #{businessType},
+            </if>
+            <if test="state != null">
+                state = #{state},
+            </if>
+            <if test="openid != null">
+                openid = #{openid},
+            </if>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="orderId != null">
+                order_id = #{orderId},
+            </if>
+            <if test="handleTime != null and handleTime!=''">
+                handle_time = #{handleTime},
+            </if>
+            <if test="nextHandleTime != null and nextHandleTime!=''">
+                next_handle_time = #{nextHandleTime},
+            </if>
+            <if test="describe != null and describe!=''">
+                `describe` = #{describe},
+            </if>
+            <if test="round != null">
+                round = #{round}
+            </if>
+        </set>
+    </sql>
+
+    <update id="update" >
+        UPDATE  sub_info
+        <include refid="update_sql" />
+        WHERE
+        sid = #{sid}
+    </update>
+
+    <update id="updateByState" >
+        UPDATE  sub_info
+        <include refid="update_sql" />
+        WHERE
+        sid = #{sid} and state=0
+    </update>
+
+
+    <sql id="findPage_where">
+        <where>
+            1 = 1
+            <if test="sid != null">
+                AND sid = #{sid}
+            </if>
+            <if test="url != null">
+                AND url = #{url}
+            </if>
+            <if test="name != null and name !=''">
+                AND name = #{name}
+            </if>
+            <if test="userId != null">
+                and  user_id = #{userId}
+            </if>
+            <if test="state != null">
+                and  state = #{state}
+            </if>
+            <if test="subType != null">
+                and  sub_type = #{subType}
+            </if>
+
+            <if test="openid != null">
+                and  openid = #{openid}
+            </if>
+            <if test="orderId != null">
+                and  order_Id = #{orderId}
+            </if>
+            <if test="round != null">
+                and  round = #{round}
+            </if>
+            <if test="handleTime != null and handleTime!=''">
+                and  handle_time = #{handleTime}
+            </if>
+            <if test="subTimeStart != null and subTimeStart!=''">
+                and  sub_time &gt; #{subTimeStart}
+            </if>
+            <if test="subTimeEnd != null and subTimeEnd!=''">
+                and  sub_time &lt; #{subTimeEnd}
+            </if>
+            <if test="nextHandleTime != null and nextHandleTime!=''">
+                and next_handle_time = #{nextHandleTime}
+            </if>
+            <if test="describe != null and describe!=''">
+                and `describe` = #{describe}
+            </if>
+        </where>
+    </sql>
+
+    <select id="findPage_count" resultType="long">
+        SELECT count(*) FROM sub_info
+        <include refid="findPage_where"/>
+    </select>
+
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="findPage" resultMap="subinfo">
+        SELECT <include refid="columns" />
+        FROM sub_info
+        <include refid="findPage_where"/>
+
+        <if test="sortColumns != null and sortColumns !=''">
+            ORDER BY ${sortColumns}
+        </if>
+    </select>
+
+    <select id="getById" resultMap="subinfo">
+        SELECT <include refid="columns" />
+        FROM sub_info where sid=#{sid}
+    </select>
+
+
+
+    <select id="getUnHandleSubInfo" resultMap="subinfo">
+        SELECT * FROM (
+        SELECT * FROM sub_info	t WHERE t.`handle_time` IS NULL AND t.`state`=0
+        UNION
+        SELECT * FROM sub_info t WHERE DATE_ADD(t.`handle_time`, INTERVAL 1 DAY) &lt; NOW() AND ROUND!=5) cc ORDER BY sub_time DESC
+    </select>
+
+    <select id="getUnHandleSubInfoCount" resultType="long">
+        SELECT count(1) FROM (
+        SELECT * FROM sub_info	t WHERE t.`handle_time` IS NULL AND t.`state`=0
+        UNION
+        SELECT * FROM sub_info t WHERE DATE_ADD(t.`handle_time`, INTERVAL 1 DAY) &lt; NOW() AND ROUND!=5) cc
+    </select>
+
+    <!--查找需要当日处理的企业 数量-->
+    <select id="getSubInfoCountByHandleTime" parameterType="java.util.HashMap" resultType="long">
+         SELECT COUNT(*) FROM sub_info t WHERE DATE_FORMAT(handle_time,'%Y-%m-%d')=#{date}
+          and t.`state`!= 5 and t.`sub_type`=2
+    </select>
+
+    <select id="getScheduleSubInfoByDate" parameterType="java.util.HashMap" resultMap="subinfo">
+        SELECT * FROM sub_info t WHERE DATE_FORMAT(handle_time,'%Y-%m-%d')=#{date}
+        and t.`state`= 3 and t.`sub_type`=2 and t.round &lt; 13
+    </select>
+</mapper>

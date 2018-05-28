@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="com.wxy.dg.common.model.ConsumerOrder">
+
+    <resultMap id="consumerOrder" type="com.wxy.dg.common.model.ConsumerOrder">
+        <result property="id" column="id"/>
+        <result property="openId" column="openId"/>
+        <result property="orderId" column="order_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="count" column="count"/>
+
+    </resultMap>
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="columns">
+        <![CDATA[
+		id,openId,order_id,create_time,update_time,`count`
+	    ]]>
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        <![CDATA[
+        INSERT INTO `consumer_order` (
+        	id,openId,order_id,create_time,update_time,`count`
+        ) VALUES (
+        	#{id} ,
+        	#{openId} ,
+        	#{orderId} ,
+        	#{createTime},
+        	#{updateTime},
+        	#{count}
+        )
+    ]]>
+    </insert>
+
+    <sql id="update_sql">
+        <set>
+            <if test="openId != null and openId != ''">
+                openId = #{openId},
+            </if>
+            <if test="orderId != null">
+                order_id = #{orderId},
+            </if>
+            <if test="createTime != null and createTime !=''">
+                create_time = #{createTime},
+            </if>
+            <if test="updateTime != null">
+                `update_time` = #{updateTime},
+            </if>
+            <if test="count != null">
+                `count` = #{count}
+            </if>
+        </set>
+    </sql>
+
+    <update id="update" >
+        UPDATE  `consumer_order`
+        <include refid="update_sql" />
+        WHERE
+        ID = #{id}
+    </update>
+
+    <sql id="findPage_where">
+        <where>
+            1 = 1
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="openId != null and openId !='' ">
+                and openId = #{openId}
+            </if>
+            <if test="orderId != null">
+                and order_id = #{orderId}
+            </if>
+            <if test="createTime != null and createTime !=''">
+                and create_time = #{createTime}
+            </if>
+            <if test="updateTime != null">
+                and `update_time` = #{updateTime}
+            </if>
+        </where>
+    </sql>
+
+    <select id="findPage_count" resultType="long">
+        SELECT count(*) FROM `consumer_order`
+        <include refid="findPage_where"/>
+    </select>
+
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="findPage" resultMap="consumerOrder">
+        SELECT <include refid="columns" />
+        FROM `consumer_order`
+        <include refid="findPage_where"/>
+
+        <if test="sortColumns != null and sortColumns !=''">
+            ORDER BY ${sortColumns}
+        </if>
+    </select>
+
+    <select id="getById" resultMap="consumerOrder">
+        SELECT <include refid="columns" />
+        <![CDATA[
+		    FROM `consumer_order`
+	        WHERE
+		        ID = #{id}
+	    ]]>
+    </select>
+
+</mapper>

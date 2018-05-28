@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Properties>
+        <Property name="LOG.PATH">d:/logs</Property>
+        <Property name="LOG.PATTERN">%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}.%M(%L) %m%n </Property>
+    </Properties>
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${LOG.PATTERN}" />
+        </Console>
+
+        <!-- info -->
+        <RollingRandomAccessFile name="infoFile" fileName="${LOG.PATH}/ql-zw-info.log"
+                                 filePattern="${LOG.PATH}/ql-zw-info-%i.log"
+                                 bufferSize="8192" immediateFlush="false" append="true" >
+            <Filters>
+                <ThresholdFilter level="error" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <PatternLayout pattern="${LOG.PATTERN}" />
+            <Policies>
+                <SizeBasedTriggeringPolicy size="100MB" />
+            </Policies>
+            <DefaultRolloverStrategy max="50" />
+        </RollingRandomAccessFile >
+
+        <!-- error -->
+        <RollingRandomAccessFile name="errorFile" fileName="${LOG.PATH}/ql-zw-error.log"
+                                 filePattern="${LOG.PATH}/ql-zw-error-%i.log"
+                                 bufferSize="1024" immediateFlush="false" append="true" >
+            <Filters>
+                <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <PatternLayout pattern="${LOG.PATTERN}" />
+            <Policies>
+                <SizeBasedTriggeringPolicy size="100MB" />
+            </Policies>
+            <DefaultRolloverStrategy max="5" />
+        </RollingRandomAccessFile >
+    </Appenders>
+
+    <Loggers>
+        <!--自定义：过滤掉spring和mybatis的一些无用的DEBUG信息-->
+        <AsyncRoot level="info">
+            <!-- 生产环境去掉console -->
+            <AppenderRef ref="console" />
+            <AppenderRef ref="infoFile" />
+            <AppenderRef ref="errorFile" />
+        </AsyncRoot>
+    </Loggers>
+</Configuration>

@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="ky.erp.model.WarehouseSheet">
+
+	<resultMap id="RM_WarehouseSheet" type="ky.erp.model.WarehouseSheet">
+        <result property="id" column="id"/>
+        <result property="department" column="department"/>
+        <result property="no" column="No"/>
+        <result property="applyTime" column="apply_time"/>
+        <result property="yn" column="yn"/>
+        <result property="state" column="state"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createUser" column="create_user"/>
+        <result property="updateUser" column="update_user"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="columns">
+	    <![CDATA[
+		id,department,No,apply_time,yn,state,create_time,update_time,create_user,update_user
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    <![CDATA[
+        INSERT INTO warehouse_sheet (
+        	id ,
+        	department ,
+        	No ,
+        	apply_time ,
+        	yn ,
+        	state ,
+        	create_time ,
+        	update_time ,
+        	create_user ,
+        	update_user 
+        ) VALUES (
+        	#{id} ,
+        	#{department} ,
+        	#{no} ,
+        	#{applyTime} ,
+        	#{yn} ,
+        	#{state} ,
+        	#{createTime} ,
+        	#{updateTime} ,
+        	#{createUser} ,
+        	#{updateUser} 
+        )
+    ]]>
+		<!--	
+			oracle: order="BEFORE" SELECT sequenceName.nextval AS ID FROM DUAL 
+			DB2: order="BEFORE"" values nextval for sequenceName
+		<selectKey resultType="java.lang.Long" order="BEFORE" keyProperty="userId">
+			SELECT sequenceName.nextval AS ID FROM DUAL 
+        </selectKey>
+		-->
+	</insert>
+	
+	
+     <sql id="update_sql">
+         <set>
+                <if test="department != null and department != ''">
+	         	department = #{department} ,
+	         </if>
+                <if test="no != null and no != ''">
+	         	No = #{no} ,
+	         </if>
+                <if test="applyTime != null">
+	         	apply_time = #{applyTime} ,
+	       </if>
+                <if test="yn != null">
+	         	yn = #{yn} ,
+	         </if>
+                <if test="state != null">
+	         	state = #{state} ,
+	         </if>
+                <if test="createTime != null">
+	         	create_time = #{createTime} ,
+	       </if>
+                <if test="updateTime != null">
+	         	update_time = #{updateTime} ,
+	       </if>
+                <if test="createUser != null and createUser != ''">
+	         	create_user = #{createUser} ,
+	         </if>
+                <if test="updateUser != null and updateUser != ''">
+	         	update_user = #{updateUser} 
+	         </if>
+       </set>
+    </sql>
+    
+	<update id="update" >
+	        UPDATE  warehouse_sheet
+	    <include refid="update_sql" />
+	        WHERE 
+	                id = #{id} 
+	</update>
+
+    <delete id="delete">
+    <![CDATA[
+        DELETE FROM warehouse_sheet WHERE
+        id = #{id} 
+    ]]>
+    </delete>
+    
+    <select id="getById" resultMap="RM_WarehouseSheet">
+		SELECT <include refid="columns" />
+	    <![CDATA[
+		    FROM warehouse_sheet 
+	        WHERE 
+		        id = #{id} 
+	    ]]>
+	</select>
+	
+	<sql id="findPage_where">
+		<!-- ognl访问静态方法的表达式 为@class@method(args),以下为调用rapid中的Ognl.isNotEmpty()方法,还有其它方法如isNotBlank()可以使用，具体请查看Ognl类 -->
+		<where>	      				
+               <if test="id != null">
+		             AND id = #{id}
+	           </if>
+                <if test="department != null and department !=''">
+		             AND department = #{department}
+	            </if>
+                <if test="no != null and no !=''">
+		             AND No = #{no}
+	            </if>
+		       <if test="applyTimeBegin != null">
+					AND apply_time >= #{applyTimeBegin}
+			   </if>
+			   <if test="applyTimeEnd != null">
+					AND apply_time &lt;= #{applyTimeEnd}
+			   </if>
+               <if test="yn != null">
+		             AND yn = #{yn}
+	           </if>
+               <if test="state != null">
+		             AND state = #{state}
+	           </if>
+		       <if test="createTimeBegin != null">
+					AND create_time >= #{createTimeBegin}
+			   </if>
+			   <if test="createTimeEnd != null">
+					AND create_time &lt;= #{createTimeEnd}
+			   </if>
+		       <if test="updateTimeBegin != null">
+					AND update_time >= #{updateTimeBegin}
+			   </if>
+			   <if test="updateTimeEnd != null">
+					AND update_time &lt;= #{updateTimeEnd}
+			   </if>
+                <if test="createUser != null and createUser !=''">
+		             AND create_user = #{createUser}
+	            </if>
+                <if test="updateUser != null and updateUser !=''">
+		             AND update_user = #{updateUser}
+	            </if>
+		</where>
+	</sql>
+		
+    <select id="findPage_count" resultType="long">
+        SELECT count(*) FROM warehouse_sheet 
+		<include refid="findPage_where"/>    
+    </select>
+    
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="findPage" resultMap="RM_WarehouseSheet">
+    	SELECT <include refid="columns" />
+	    FROM warehouse_sheet 
+		<include refid="findPage_where"/>
+		
+		<if test="sortColumns != null and sortColumns !=''">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+	
+</mapper>
+
