@@ -1,6 +1,6 @@
 /*
-SQLyog Ultimate v12.09 (64 bit)
-MySQL - 5.6.34 : Database - dg-ai
+SQLyog v10.2
+MySQL - 5.5.28-log : Database - dg-ai
 *********************************************************************
 */
 
@@ -97,6 +97,25 @@ CREATE TABLE `organization` (
 
 insert  into `organization`(`id`,`parent_id`,`name`,`master`,`phone`,`remark`,`del_flag`) values (1,'0','汝阳县',NULL,NULL,NULL,'0'),(20,'1','销售一部','','','','0'),(30,'1','销售二','','','','0'),(40,'20','国内','','','','0');
 
+/*Table structure for table `product` */
+
+DROP TABLE IF EXISTS `product`;
+
+CREATE TABLE `product` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sheet_id` int(11) NOT NULL COMMENT '仓库sheet id',
+  `format` varchar(64) DEFAULT NULL COMMENT '规格',
+  `original_count` int(11) DEFAULT NULL COMMENT '申请数量',
+  `real_count` int(11) DEFAULT NULL COMMENT '实际数量',
+  `price` float DEFAULT NULL COMMENT '单价',
+  `remark` varchar(200) DEFAULT NULL COMMENT '备注',
+  `create_time` time DEFAULT NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  KEY `sheet_id` (`sheet_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*Data for the table `product` */
+
 /*Table structure for table `sms_code` */
 
 DROP TABLE IF EXISTS `sms_code`;
@@ -178,6 +197,26 @@ CREATE TABLE `user` (
 /*Data for the table `user` */
 
 insert  into `user`(`id`,`login_name`,`password`,`name`,`phone`,`frequency`,`orgId`,`user_type`,`imei`,`deviceType`,`channelId`,`login_date`,`create_date`,`update_date`,`remark`,`del_flag`) values (1,'admin','02a3f0772fcca9f415adc990734b45c6f059c7d33ee28362c4852032','管理员','',3,1,'100','','','','2016-12-11 18:03:47',NULL,'2015-05-05 14:07:58','12','0'),(2,'test001','02a3f0772fcca9f415adc990734b45c6f059c7d33ee28362c4852032','test001','18530990233',2,20,'102','864103020368632','','','2016-12-10 23:02:27','2015-05-05 11:21:49','2015-08-24 16:23:20','','0'),(3,'test002','02a3f0772fcca9f415adc990734b45c6f059c7d33ee28362c4852032','test002','',3,40,'101','866328021587454','3','4508383378934736929','2015-10-30 14:23:36','2015-05-05 11:22:02','2015-10-30 14:23:15','','0'),(4,'test003','02a3f0772fcca9f415adc990734b45c6f059c7d33ee28362c4852032','test003','',3,30,'102','352136061858607','','','2015-08-24 16:38:50','2015-05-05 11:22:18','2015-08-24 16:38:50','','0'),(5,'test15','c71991fda82fc933cc4e84aabd2da62bc6c90a1ef5304ae9680447f1','test15','',0,NULL,'101',NULL,'','','2016-12-11 12:54:29','2016-12-11 12:32:38','2016-12-11 12:32:38','test15','0'),(6,'test12','0bef50ef624123561c012a1f4542098fbaf7f4d7a7cba4f2a0b23a25','test12','',0,NULL,'100',NULL,'','',NULL,'2016-12-11 14:44:40','2016-12-11 14:44:40','','1');
+
+/*Table structure for table `warehouse_sheet` */
+
+DROP TABLE IF EXISTS `warehouse_sheet`;
+
+CREATE TABLE `warehouse_sheet` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `department` varchar(64) DEFAULT NULL COMMENT '申请部门',
+  `No` varchar(32) DEFAULT NULL COMMENT '申请编号（自动生成）',
+  `apply_time` time DEFAULT NULL COMMENT '申请时间',
+  `yn` tinyint(3) DEFAULT NULL COMMENT '是否有效',
+  `state` tinyint(3) DEFAULT NULL COMMENT '表单状态',
+  `create_time` time DEFAULT NULL COMMENT '创建时间',
+  `update_time` time DEFAULT NULL COMMENT '更新时间',
+  `create_user` varchar(32) DEFAULT NULL COMMENT '创建人',
+  `update_user` varchar(32) DEFAULT NULL COMMENT '更新人',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*Data for the table `warehouse_sheet` */
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
