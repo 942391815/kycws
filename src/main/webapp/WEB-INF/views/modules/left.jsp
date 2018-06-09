@@ -29,12 +29,13 @@
     <div class="accordion-group">
         <div class="accordion-heading">
             <a class="accordion-toggle" data-toggle="collapse" data-parent="#menu" href="#collapse1" title=""><i
-                    class="icon-chevron-down"></i>&nbsp;任务列表</a>
+                    class="icon-chevron-down"></i>&nbsp;仓库</a>
         </div>
         <div id="collapse1" class="accordion-body collapse in">
             <div class="accordion-inner">
                 <ul class="nav nav-list">
-                    <li><a href="${ctx}/attendance" target="mainFrame"><i class="icon-search"></i>&nbsp;任务列表</a></li>
+                    <li><a href="${ctx}/warehouse/query" target="mainFrame"><i class="icon-search"></i>&nbsp;查询领料单</a></li>
+                    <li><a href="${ctx}/warehouse/index" target="mainFrame"><i class="icon-search"></i>&nbsp;添加领料单</a></li>
                 </ul>
             </div>
         </div>
@@ -43,14 +44,12 @@
     <div class="accordion-group">
         <div class="accordion-heading">
             <a class="accordion-toggle" data-toggle="collapse" data-parent="#menu" href="#collapse2" title=""><i
-                    class="icon-chevron-down"></i>&nbsp;我的任务</a>
+                    class="icon-chevron-down"></i>&nbsp;销售部</a>
         </div>
         <div id="collapse2" class="accordion-body collapse in">
             <div class="accordion-inner">
                 <ul class="nav nav-list">
-                    <li><a href="${ctx}/mywork" target="mainFrame"><i class="icon-search"></i>&nbsp;我的任务</a></li>
-                    <li><a href="${ctx}/myInHandWork" target="mainFrame"><i class="icon-search"></i>&nbsp;进行中任务</a></li>
-                    <li><a href="${ctx}/mySubmitWork" target="mainFrame"><i class="icon-search"></i>&nbsp;已提交任务</a></li>
+                    <li><a href="${ctx}/mywork" target="mainFrame"><i class="icon-search"></i>&nbsp;产品购销协议书</a></li>
 
                 </ul>
             </div>
